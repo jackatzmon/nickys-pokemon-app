@@ -26,23 +26,23 @@ class PokemonCardGraderApp extends StatelessWidget {
         textTheme: const TextTheme(
           displayLarge: TextStyle(
             fontSize: 32,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
             color: Color(0xFF3D7DCA),
             shadows: [
               Shadow(
                 color: Color(0xFFFFCB05),
-                offset: Offset(2, 2),
+                offset: Offset(1.5, 1.5),
                 blurRadius: 0,
               ),
             ],
           ),
           displayMedium: TextStyle(
             fontSize: 24,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
             color: Color(0xFF3D7DCA),
           ),
-          bodyLarge: TextStyle(fontSize: 16),
-          bodyMedium: TextStyle(fontSize: 14),
+          bodyLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.normal),
+          bodyMedium: TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
@@ -56,7 +56,7 @@ class PokemonCardGraderApp extends StatelessWidget {
             ),
           ),
         ),
-        cardTheme: CardThemeData(
+        cardTheme: CardTheme(
           elevation: 8,
           shadowColor: Colors.black26,
           shape: RoundedRectangleBorder(

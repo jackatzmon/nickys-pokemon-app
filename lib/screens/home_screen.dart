@@ -378,9 +378,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                           "Nicky's Pokémon App™",
                           style: TextStyle(
                             fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w600,
                             color: Colors.white,
-                            letterSpacing: 1,
+                            letterSpacing: 0.5,
                           ),
                         ),
                         Text(
