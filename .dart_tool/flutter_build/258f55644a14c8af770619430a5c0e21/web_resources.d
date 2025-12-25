@@ -1,0 +1,1 @@
+ C:\\nickys_pokemon_app\\build\\web\\manifest.json:  C:\\nickys_pokemon_app\\web\\index.html C:\\nickys_pokemon_app\\web\\manifest.json
