@@ -56,7 +56,7 @@ class PokemonCardGraderApp extends StatelessWidget {
             ),
           ),
         ),
-        cardTheme: CardTheme(
+        cardTheme: CardThemeData(
           elevation: 8,
           shadowColor: Colors.black26,
           shape: RoundedRectangleBorder(

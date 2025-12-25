@@ -99,7 +99,7 @@ class ResultScreen extends StatelessWidget {
                         card.backConditionGrade, card.backConditionScore,
                         card.backIssues, const Color(0xFF3D7DCA)),
                       const SizedBox(height: 24),
-                      _buildActionButtons(),
+                      _buildActionButtons(context),
                       const SizedBox(height: 12),
                       _buildDisclaimer(),
                     ],
@@ -476,9 +476,9 @@ class ResultScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButtons() {
-    return ElevatedButton(
-      onPressed: () => Navigator.pop(context),
+ Widget _buildActionButtons(BuildContext context) {
+  return ElevatedButton(
+    onPressed: () => Navigator.pop(context),
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFFFFCB05),
         foregroundColor: const Color(0xFF3D7DCA),
