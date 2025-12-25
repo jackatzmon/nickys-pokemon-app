@@ -12,10 +12,6 @@ dependencies:
   cupertino_icons: ^1.0.2
   camera: ^0.10.5+5
   image_picker: ^1.0.4
-<<<<<<< HEAD
-=======
-  # No OCR package needed - using Tesseract.js directly
->>>>>>> 2b7b9fdce807e425142e282dcda4799ed5d56c5d
   http: ^1.1.0
   path_provider: ^2.1.1
   path: ^1.8.3

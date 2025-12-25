@@ -476,13 +476,9 @@ class ResultScreen extends StatelessWidget {
     );
   }
 
-<<<<<<< HEAD
   Widget _buildActionButtons(BuildContext context) {
-=======
- Widget _buildActionButtons(BuildContext context) {
->>>>>>> 2b7b9fdce807e425142e282dcda4799ed5d56c5d
-  return ElevatedButton(
-    onPressed: () => Navigator.pop(context),
+    return ElevatedButton(
+      onPressed: () => Navigator.pop(context),
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFFFFCB05),
         foregroundColor: const Color(0xFF3D7DCA),
