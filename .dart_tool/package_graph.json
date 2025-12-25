@@ -10,7 +10,6 @@
         "camera",
         "cupertino_icons",
         "flutter",
-        "google_ml_kit",
         "http",
         "image",
         "image_picker",
@@ -81,27 +80,6 @@
         "http_parser",
         "meta",
         "web"
-      ]
-    },
-    {
-      "name": "google_ml_kit",
-      "version": "0.16.3",
-      "dependencies": [
-        "flutter",
-        "google_mlkit_barcode_scanning",
-        "google_mlkit_commons",
-        "google_mlkit_digital_ink_recognition",
-        "google_mlkit_entity_extraction",
-        "google_mlkit_face_detection",
-        "google_mlkit_face_mesh_detection",
-        "google_mlkit_image_labeling",
-        "google_mlkit_language_id",
-        "google_mlkit_object_detection",
-        "google_mlkit_pose_detection",
-        "google_mlkit_selfie_segmentation",
-        "google_mlkit_smart_reply",
-        "google_mlkit_text_recognition",
-        "google_mlkit_translation"
       ]
     },
     {
@@ -316,115 +294,6 @@
       "dependencies": [
         "collection",
         "meta"
-      ]
-    },
-    {
-      "name": "google_mlkit_smart_reply",
-      "version": "0.9.0",
-      "dependencies": [
-        "flutter"
-      ]
-    },
-    {
-      "name": "google_mlkit_translation",
-      "version": "0.9.0",
-      "dependencies": [
-        "flutter",
-        "google_mlkit_commons"
-      ]
-    },
-    {
-      "name": "google_mlkit_language_id",
-      "version": "0.9.0",
-      "dependencies": [
-        "flutter"
-      ]
-    },
-    {
-      "name": "google_mlkit_entity_extraction",
-      "version": "0.11.0",
-      "dependencies": [
-        "flutter",
-        "google_mlkit_commons"
-      ]
-    },
-    {
-      "name": "google_mlkit_text_recognition",
-      "version": "0.11.0",
-      "dependencies": [
-        "flutter",
-        "google_mlkit_commons"
-      ]
-    },
-    {
-      "name": "google_mlkit_selfie_segmentation",
-      "version": "0.6.0",
-      "dependencies": [
-        "flutter",
-        "google_mlkit_commons"
-      ]
-    },
-    {
-      "name": "google_mlkit_pose_detection",
-      "version": "0.10.0",
-      "dependencies": [
-        "flutter",
-        "google_mlkit_commons"
-      ]
-    },
-    {
-      "name": "google_mlkit_object_detection",
-      "version": "0.11.0",
-      "dependencies": [
-        "flutter",
-        "google_mlkit_commons"
-      ]
-    },
-    {
-      "name": "google_mlkit_image_labeling",
-      "version": "0.10.0",
-      "dependencies": [
-        "flutter",
-        "google_mlkit_commons"
-      ]
-    },
-    {
-      "name": "google_mlkit_face_mesh_detection",
-      "version": "0.0.2",
-      "dependencies": [
-        "flutter",
-        "google_mlkit_commons"
-      ]
-    },
-    {
-      "name": "google_mlkit_face_detection",
-      "version": "0.9.0",
-      "dependencies": [
-        "flutter",
-        "google_mlkit_commons"
-      ]
-    },
-    {
-      "name": "google_mlkit_digital_ink_recognition",
-      "version": "0.10.0",
-      "dependencies": [
-        "flutter",
-        "google_mlkit_commons"
-      ]
-    },
-    {
-      "name": "google_mlkit_barcode_scanning",
-      "version": "0.10.0",
-      "dependencies": [
-        "flutter",
-        "google_mlkit_commons"
-      ]
-    },
-    {
-      "name": "google_mlkit_commons",
-      "version": "0.6.1",
-      "dependencies": [
-        "flutter"
       ]
     },
     {

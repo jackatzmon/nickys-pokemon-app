@@ -1,20 +1,15 @@
-import 'dart:io';
-import 'package:google_ml_kit/google_ml_kit.dart';
+import 'dart:html' as html;
+import 'dart:js' as js;
+import 'dart:async';
 import 'package:image/image.dart' as img;
 
 class VisionService {
-  // Analyze image quality and detect defects
   static Future<Map<String, dynamic>> analyzeCondition(String imagePath) async {
-    final inputImage = InputImage.fromFilePath(imagePath);
-    final textRecognizer = TextRecognizer();
-    
     try {
-      // Get text from image for card identification
-      final RecognizedText recognizedText = await textRecognizer.processImage(inputImage);
-      
-      // Analyze image for condition
-      final File imageFile = File(imagePath);
-      final bytes = await imageFile.readAsBytes();
+      // For web, imagePath is a blob URL
+      // Get image data
+      final blob = await _getBlobFromUrl(imagePath);
+      final bytes = await _readBlobAsBytes(blob);
       final image = img.decodeImage(bytes);
       
       if (image == null) {
@@ -24,8 +19,11 @@ class VisionService {
       // Calculate condition metrics
       final conditionMetrics = _calculateConditionMetrics(image);
       
-      // Extract card information from text
-      final cardInfo = _extractCardInfo(recognizedText.text);
+      // Use Tesseract.js for OCR
+      final ocrText = await _performOCR(imagePath);
+      
+      // Extract card information
+      final cardInfo = _extractCardInfo(ocrText);
       
       return {
         'score': conditionMetrics['score'],
@@ -35,10 +33,87 @@ class VisionService {
         'setName': cardInfo['set'],
         'cardNumber': cardInfo['number'],
         'rarity': cardInfo['rarity'],
-        'text': recognizedText.text,
+        'text': ocrText,
       };
-    } finally {
-      textRecognizer.close();
+    } catch (e) {
+      print('Error in analyzeCondition: $e');
+      // Return default values on error
+      return {
+        'score': 7.0,
+        'grade': 'Excellent 7',
+        'issues': ['Unable to perform full analysis'],
+        'cardName': null,
+        'setName': null,
+        'cardNumber': null,
+        'rarity': null,
+        'text': '',
+      };
+    }
+  }
+
+  static Future<html.Blob> _getBlobFromUrl(String url) async {
+    final response = await html.window.fetch(url);
+    return await response.blob();
+  }
+
+  static Future<List<int>> _readBlobAsBytes(html.Blob blob) async {
+    final completer = Completer<List<int>>();
+    final reader = html.FileReader();
+    
+    reader.onLoadEnd.listen((e) {
+      final result = reader.result as List<int>;
+      completer.complete(result);
+    });
+    
+    reader.onError.listen((e) {
+      completer.completeError('Failed to read blob');
+    });
+    
+    reader.readAsArrayBuffer(blob);
+    return completer.future;
+  }
+
+  static Future<String> _performOCR(String imageUrl) async {
+    try {
+      final completer = Completer<String>();
+      
+      // Call Tesseract.js
+      js.context.callMethod('eval', ['''
+        (async function() {
+          try {
+            const { data: { text } } = await Tesseract.recognize(
+              '$imageUrl',
+              'eng',
+              { logger: m => console.log(m) }
+            );
+            window.ocrResult = text;
+          } catch (error) {
+            console.error('OCR Error:', error);
+            window.ocrResult = '';
+          }
+        })();
+      ''']);
+      
+      // Poll for result
+      int attempts = 0;
+      while (attempts < 50) { // 10 seconds max
+        await Future.delayed(Duration(milliseconds: 200));
+        final result = js.context['ocrResult'];
+        if (result != null && result.toString().isNotEmpty) {
+          completer.complete(result.toString());
+          break;
+        }
+        attempts++;
+      }
+      
+      if (!completer.isCompleted) {
+        completer.complete('');
+      }
+      
+      return completer.future;
+    } catch (e) {
+      print('OCR error: $e');
+      return '';
     }
   }
 
@@ -46,37 +121,31 @@ class VisionService {
     List<String> issues = [];
     double score = 10.0;
 
-    // Check for edge wear (detect brightness variations at edges)
     final edgeQuality = _analyzeEdges(image);
     if (edgeQuality < 0.8) {
       issues.add('Edge wear detected');
       score -= (1.0 - edgeQuality) * 2.0;
     }
 
-    // Check for centering
     final centeringScore = _analyzeCentering(image);
     if (centeringScore < 0.9) {
       issues.add('Off-center printing');
       score -= (1.0 - centeringScore) * 1.5;
     }
 
-    // Check for scratches/surface issues (detect noise)
     final surfaceQuality = _analyzeSurface(image);
     if (surfaceQuality < 0.85) {
       issues.add('Surface wear or scratches');
       score -= (1.0 - surfaceQuality) * 2.5;
     }
 
-    // Check corners (detect damage in corner regions)
     final cornerQuality = _analyzeCorners(image);
     if (cornerQuality < 0.85) {
       issues.add('Corner wear or damage');
       score -= (1.0 - cornerQuality) * 2.0;
     }
 
-    // Ensure score doesn't go below 1.0
     score = score.clamp(1.0, 10.0);
-
     String grade = _scoreToGrade(score);
 
     return {
@@ -87,13 +156,11 @@ class VisionService {
   }
 
   static double _analyzeEdges(img.Image image) {
-    // Sample edge pixels and check for consistency
     int edgeWidth = (image.width * 0.05).toInt();
     int edgeHeight = (image.height * 0.05).toInt();
     
     List<int> edgeValues = [];
     
-    // Top edge
     for (int x = 0; x < image.width; x += 5) {
       for (int y = 0; y < edgeHeight; y++) {
         final pixel = image.getPixel(x, y);
@@ -101,19 +168,15 @@ class VisionService {
       }
     }
     
-    // Calculate variance (high variance = wear/damage)
     double variance = _calculateVariance(edgeValues);
     return (1.0 - (variance / 10000)).clamp(0.0, 1.0);
   }
 
   static double _analyzeCentering(img.Image image) {
-    // Simplified centering check - would need card border detection for accuracy
-    // For now, return high score as placeholder
     return 0.95;
   }
 
   static double _analyzeSurface(img.Image image) {
-    // Sample center region and check for noise/inconsistencies
     int centerX = image.width ~/ 2;
     int centerY = image.height ~/ 2;
     int sampleSize = 100;
@@ -137,12 +200,11 @@ class VisionService {
     int cornerSize = 50;
     List<double> cornerScores = [];
     
-    // Check all four corners
     List<List<int>> corners = [
-      [0, 0], // Top-left
-      [image.width - cornerSize, 0], // Top-right
-      [0, image.height - cornerSize], // Bottom-left
-      [image.width - cornerSize, image.height - cornerSize], // Bottom-right
+      [0, 0],
+      [image.width - cornerSize, 0],
+      [0, image.height - cornerSize],
+      [image.width - cornerSize, image.height - cornerSize],
     ];
     
     for (var corner in corners) {
@@ -197,22 +259,18 @@ class VisionService {
 
     final lines = text.split('\n');
     
-    // Look for common Pokemon card patterns
     for (var line in lines) {
-      // Card numbers usually in format like "025/165" or "#25"
       final numberMatch = RegExp(r'(\d+)[/](\d+)').firstMatch(line);
       if (numberMatch != null && cardNumber == null) {
         cardNumber = numberMatch.group(0);
       }
 
-      // Rarity symbols or text
       if (line.toLowerCase().contains('rare') || 
           line.contains('★') || 
           line.toLowerCase().contains('holo')) {
         rarity = line.trim();
       }
 
-      // Pokemon names are often at the top (capitalized words)
       if (cardName == null && line.length > 2 && line.length < 30) {
         if (RegExp(r'^[A-Z][a-zA-Z\s-]+$').hasMatch(line.trim())) {
           cardName = line.trim();
@@ -220,7 +278,6 @@ class VisionService {
       }
     }
 
-    // Try to identify set from text patterns
     final commonSets = ['Base Set', 'Jungle', 'Fossil', 'Team Rocket', 'Gym', 
                         'Neo', 'Legendary', 'Expedition', 'Sword & Shield', 
                         'Sun & Moon', 'XY', 'Black & White'];

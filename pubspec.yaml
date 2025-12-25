@@ -12,7 +12,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   camera: ^0.10.5+5
   image_picker: ^1.0.4
-  google_ml_kit: ^0.16.3
+  # No OCR package needed - using Tesseract.js directly
   http: ^1.1.0
   path_provider: ^2.1.1
   path: ^1.8.3
