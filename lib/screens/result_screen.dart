@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:typed_data';
 import '../models/pokemon_card.dart';
 
 class ResultScreen extends StatelessWidget {
@@ -90,11 +91,11 @@ class ResultScreen extends StatelessWidget {
                       const SizedBox(height: 16),
                       _buildOverallGrade(),
                       const SizedBox(height: 16),
-                      _buildConditionCard('FRONT', card.frontImagePath, 
+                      _buildConditionCard('FRONT', card.frontImagePath, card.frontImageBytes,
                         card.frontConditionGrade, card.frontConditionScore,
                         card.frontIssues, const Color(0xFFCC0000)),
                       const SizedBox(height: 16),
-                      _buildConditionCard('BACK', card.backImagePath,
+                      _buildConditionCard('BACK', card.backImagePath, card.backImageBytes,
                         card.backConditionGrade, card.backConditionScore,
                         card.backIssues, const Color(0xFF3D7DCA)),
                       const SizedBox(height: 24),
@@ -284,6 +285,7 @@ class ResultScreen extends StatelessWidget {
   Widget _buildConditionCard(
     String label,
     String imagePath,
+    Uint8List? imageBytes,
     String grade,
     double score,
     List<String> issues,
@@ -343,29 +345,48 @@ class ResultScreen extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: accentColor, width: 2),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: 200,
-                      child: Image.network(
-                        imagePath,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            height: 200,
-                            color: Colors.grey[300],
-                            child: const Center(
-                              child: Icon(Icons.image_not_supported, size: 50),
+                  child: imageBytes != null
+                      ? Image.memory(
+                          imageBytes,
+                          width: double.infinity,
+                          height: 200,
+                          fit: BoxFit.cover,
+                        )
+                      : Container(
+                          width: double.infinity,
+                          height: 200,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                accentColor.withOpacity(0.2),
+                                accentColor.withOpacity(0.05),
+                              ],
                             ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
+                            border: Border.all(color: accentColor, width: 2),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.image,
+                                size: 60,
+                                color: accentColor.withOpacity(0.6),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Card Image',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: accentColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                 ),
                 const SizedBox(height: 16),
                 Container(

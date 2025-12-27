@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'dart:typed_data';
 import '../services/vision_service.dart';
 import '../services/pricing_service.dart';
 import '../models/pokemon_card.dart';
@@ -16,6 +17,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   final ImagePicker _picker = ImagePicker();
   String? _frontImagePath;
   String? _backImagePath;
+  Uint8List? _frontImageBytes;
+  Uint8List? _backImageBytes;
   bool _isProcessing = false;
   late AnimationController _animationController;
   late Animation<double> _pulseAnimation;
@@ -47,11 +50,14 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       );
 
       if (photo != null) {
+        final bytes = await photo.readAsBytes();
         setState(() {
           if (isFront) {
             _frontImagePath = photo.path;
+            _frontImageBytes = bytes;
           } else {
             _backImagePath = photo.path;
+            _backImageBytes = bytes;
           }
         });
       }
@@ -68,11 +74,14 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       );
 
       if (image != null) {
+        final bytes = await image.readAsBytes();
         setState(() {
           if (isFront) {
             _frontImagePath = image.path;
+            _frontImageBytes = bytes;
           } else {
             _backImagePath = image.path;
+            _backImageBytes = bytes;
           }
         });
       }
@@ -125,6 +134,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         estimatedValue: estimatedValue,
         frontImagePath: _frontImagePath!,
         backImagePath: _backImagePath!,
+        frontImageBytes: _frontImageBytes,
+        backImageBytes: _backImageBytes,
         frontIssues: List<String>.from(frontAnalysis['issues']),
         backIssues: List<String>.from(backAnalysis['issues']),
       );
@@ -431,6 +442,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   child: _buildPokemonImageCard(
                     'FRONT',
                     _frontImagePath,
+                    _frontImageBytes,
                     () => _showImageOptions(true),
                     const Color(0xFFCC0000),
                   ),
@@ -443,6 +455,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   child: _buildPokemonImageCard(
                     'BACK',
                     _backImagePath,
+                    _backImageBytes,
                     () => _showImageOptions(false),
                     const Color(0xFF3D7DCA),
                   ),
@@ -503,6 +516,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   Widget _buildPokemonImageCard(
     String label,
     String? imagePath,
+    Uint8List? imageBytes,
     VoidCallback onTap,
     Color accentColor,
   ) {
@@ -521,7 +535,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             ),
           ],
         ),
-        child: imagePath != null
+        child: imagePath != null && imageBytes != null
             ? ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: SizedBox(
@@ -531,17 +545,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       SizedBox(
                         width: double.infinity,
                         height: 250,
-                        child: Image.network(
-                          imagePath,
+                        child: Image.memory(
+                          imageBytes,
                           fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              color: Colors.grey[300],
-                              child: const Center(
-                                child: Icon(Icons.image_not_supported, size: 50),
-                              ),
-                            );
-                          },
                         ),
                       ),
                     Positioned(

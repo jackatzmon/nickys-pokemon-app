@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 class PokemonCard {
   final String? name;
   final String? setName;
@@ -11,6 +13,8 @@ class PokemonCard {
   final double estimatedValue;
   final String frontImagePath;
   final String backImagePath;
+  final Uint8List? frontImageBytes;
+  final Uint8List? backImageBytes;
   final List<String> frontIssues;
   final List<String> backIssues;
 
@@ -27,6 +31,8 @@ class PokemonCard {
     required this.estimatedValue,
     required this.frontImagePath,
     required this.backImagePath,
+    this.frontImageBytes,
+    this.backImageBytes,
     required this.frontIssues,
     required this.backIssues,
   });
