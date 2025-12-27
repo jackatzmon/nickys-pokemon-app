@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:io';
 import '../models/pokemon_card.dart';
 
 class ResultScreen extends StatelessWidget {
@@ -349,10 +348,22 @@ class ResultScreen extends StatelessWidget {
                       border: Border.all(color: accentColor, width: 2),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Image.file(
-                      File(imagePath),
+                    child: SizedBox(
+                      width: double.infinity,
                       height: 200,
-                      fit: BoxFit.cover,
+                      child: Image.network(
+                        imagePath,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            height: 200,
+                            color: Colors.grey[300],
+                            child: const Center(
+                              child: Icon(Icons.image_not_supported, size: 50),
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ),
