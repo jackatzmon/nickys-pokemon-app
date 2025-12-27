@@ -69,7 +69,7 @@ class PricingService {
       }
 
       final url = Uri.parse('https://api.pokemontcg.io/v2/cards?q=$query');
-      final response = await http.get(url).timeout(const Duration(seconds: 5));
+      final response = await http.get(url).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -96,6 +96,7 @@ class PricingService {
       }
     } catch (e) {
       print('Error fetching from Pokemon TCG API: $e');
+      print('Using heuristic pricing instead');
     }
     
     return 0.0;
