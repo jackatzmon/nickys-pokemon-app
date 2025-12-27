@@ -541,20 +541,37 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             ),
           ],
         ),
-        child: imagePath != null && imageBytes != null
+        child: imagePath != null
             ? ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: SizedBox(
                   height: 250,
                   child: Stack(
                     children: [
-                      SizedBox(
+                      Container(
                         width: double.infinity,
                         height: 250,
-                        child: Image.memory(
-                          imageBytes,
-                          fit: BoxFit.cover,
-                        ),
+                        child: imageBytes != null
+                            ? Image.memory(
+                                imageBytes,
+                                fit: BoxFit.cover,
+                              )
+                            : Container(
+                                color: accentColor.withOpacity(0.3),
+                                child: Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.warning, size: 60, color: Colors.white),
+                                      SizedBox(height: 8),
+                                      Text(
+                                        'Image bytes not loaded',
+                                        style: TextStyle(color: Colors.white, fontSize: 14),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                       ),
                     Positioned(
                       top: 12,
