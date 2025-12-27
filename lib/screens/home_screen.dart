@@ -51,6 +51,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
       if (photo != null) {
         final bytes = await photo.readAsBytes();
+        print('📸 Camera image captured!');
+        print('Path: ${photo.path}');
+        print('Bytes length: ${bytes.length}');
         setState(() {
           if (isFront) {
             _frontImagePath = photo.path;
@@ -75,6 +78,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
       if (image != null) {
         final bytes = await image.readAsBytes();
+        print('🖼️ Gallery image selected!');
+        print('Path: ${image.path}');
+        print('Bytes length: ${bytes.length}');
         setState(() {
           if (isFront) {
             _frontImagePath = image.path;
