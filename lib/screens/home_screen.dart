@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:typed_data';
 import '../services/vision_service.dart';
 import '../services/pricing_service.dart';
 import '../models/pokemon_card.dart';
+import '../widgets/web_safe_image.dart';
 import 'result_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -17,8 +17,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   final ImagePicker _picker = ImagePicker();
   String? _frontImagePath;
   String? _backImagePath;
-  Uint8List? _frontImageBytes;
-  Uint8List? _backImageBytes;
   bool _isProcessing = false;
   late AnimationController _animationController;
   late Animation<double> _pulseAnimation;
@@ -50,17 +48,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       );
 
       if (photo != null) {
-        final bytes = await photo.readAsBytes();
-        print('📸 Camera image captured!');
-        print('Path: ${photo.path}');
-        print('Bytes length: ${bytes.length}');
         setState(() {
           if (isFront) {
             _frontImagePath = photo.path;
-            _frontImageBytes = bytes;
           } else {
             _backImagePath = photo.path;
-            _backImageBytes = bytes;
           }
         });
       }
@@ -77,17 +69,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       );
 
       if (image != null) {
-        final bytes = await image.readAsBytes();
-        print('🖼️ Gallery image selected!');
-        print('Path: ${image.path}');
-        print('Bytes length: ${bytes.length}');
         setState(() {
           if (isFront) {
             _frontImagePath = image.path;
-            _frontImageBytes = bytes;
           } else {
             _backImagePath = image.path;
-            _backImageBytes = bytes;
           }
         });
       }
@@ -140,8 +126,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         estimatedValue: estimatedValue,
         frontImagePath: _frontImagePath!,
         backImagePath: _backImagePath!,
-        frontImageBytes: _frontImageBytes,
-        backImageBytes: _backImageBytes,
         frontIssues: List<String>.from(frontAnalysis['issues']),
         backIssues: List<String>.from(backAnalysis['issues']),
       );
@@ -448,7 +432,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   child: _buildPokemonImageCard(
                     'FRONT',
                     _frontImagePath,
-                    _frontImageBytes,
                     () => _showImageOptions(true),
                     const Color(0xFFCC0000),
                   ),
@@ -461,7 +444,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   child: _buildPokemonImageCard(
                     'BACK',
                     _backImagePath,
-                    _backImageBytes,
                     () => _showImageOptions(false),
                     const Color(0xFF3D7DCA),
                   ),
@@ -522,7 +504,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   Widget _buildPokemonImageCard(
     String label,
     String? imagePath,
-    Uint8List? imageBytes,
     VoidCallback onTap,
     Color accentColor,
   ) {
@@ -544,34 +525,15 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         child: imagePath != null
             ? ClipRRect(
                 borderRadius: BorderRadius.circular(16),
-                child: SizedBox(
+                child: Container(
                   height: 250,
                   child: Stack(
                     children: [
-                      Container(
+                      WebSafeImage(
+                        imagePath: imagePath,
                         width: double.infinity,
                         height: 250,
-                        child: imageBytes != null
-                            ? Image.memory(
-                                imageBytes,
-                                fit: BoxFit.cover,
-                              )
-                            : Container(
-                                color: accentColor.withOpacity(0.3),
-                                child: Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(Icons.warning, size: 60, color: Colors.white),
-                                      SizedBox(height: 8),
-                                      Text(
-                                        'Image bytes not loaded',
-                                        style: TextStyle(color: Colors.white, fontSize: 14),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
+                        fit: BoxFit.cover,
                       ),
                     Positioned(
                       top: 12,
